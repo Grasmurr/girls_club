@@ -11,8 +11,10 @@ from aiogram.types import \
      )
 from aiogram.fsm.context import FSMContext
 from aiogram.types.input_file import BufferedInputFile
-
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
+
+from telegram_bot.service import girlsclub_db
+from telegram_bot.states import Initial
 
 
 def create_keyboard_buttons(*args):
@@ -25,16 +27,15 @@ def create_keyboard_buttons(*args):
 
 @dp.message(CommandStart())
 async def main_bot_menu(message: Message, state: FSMContext):
+    await state.set_state(Initial.initial)
 
-    markup = create_keyboard_buttons('Зарегистрироваться')
+    is_registered = await girlsclub_db.get_member_girl(message.from_user.id)
 
-    # is_registered = await api_methods.get_promouter(message.from_user.id)
+    if is_registered is None:
+        markup = create_keyboard_buttons('Зарегистрироваться')
+        await message.answer(text=f'Добро пожаловать в телеграм бот женского клуба! Для регистрации скорее'
+                                  f'нажимай кнопку "Зарегистрироваться"',
+                             reply_markup=markup)
+    else:
+        pass
 
-    # print(is_registered)
-
-    # if is_registered and len(is_registered['data']) != 0:
-    #     await main_promouter_panel.accepted_promouter_panel(message, state)
-    # else:
-    #     await state.set_state(PromouterStates.begin_registration)
-    await message.answer(text=f'Добро пожаловать в телеграм бот женского клуба! ',
-                         reply_markup=markup)

@@ -18,3 +18,5 @@ pydantic_core==2.6.3
 sqlparse==0.4.4
 typing_extensions==4.7.1
 yarl==1.9.2
+celery==5.3.6
+gevent==23.9.1

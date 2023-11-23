@@ -6,6 +6,10 @@ services:
       context: ./telegram_bot
     depends_on:
       - djangoapp
+      - rabbitmq
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=amqp://guest:guest@rabbitmq:5672//
     networks:
       - mynetwork
 
@@ -32,8 +36,43 @@ services:
     networks:
       - mynetwork
 
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672" # AMQP протокол
+      - "15672:15672" # Web management interface
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - mynetwork
+    restart: always
+
+  celery_worker:
+    build:
+      context: ./telegram_bot
+    command: celery -A telegram_bot.celery.app worker --loglevel=info --pool=gevent
+    depends_on:
+      - telegram_bot
+      - rabbitmq
+    networks:
+      - mynetwork
+    restart: always
+
+  celery_beat:
+    build:
+      context: ./telegram_bot
+    command: celery -A telegram_bot.celery.app beat --loglevel=info
+    depends_on:
+      - telegram_bot
+      - rabbitmq
+    networks:
+      - mynetwork
+    restart: always
+
+
 volumes:
   pg_data:
+  rabbitmq_data:
 
 networks:
   mynetwork:
