@@ -5,8 +5,10 @@ services:
     build:
       context: ./telegram_bot
     depends_on:
-      - djangoapp
-      - rabbitmq
+      djangoapp:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=amqp://guest:guest@rabbitmq:5672//
@@ -45,6 +47,11 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - mynetwork
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
     restart: always
 
   celery_worker:
@@ -52,8 +59,10 @@ services:
       context: ./telegram_bot
     command: celery -A telegram_bot.celery.app worker --loglevel=info --pool=gevent
     depends_on:
-      - telegram_bot
-      - rabbitmq
+      telegram_bot:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - mynetwork
     restart: always
@@ -63,8 +72,10 @@ services:
       context: ./telegram_bot
     command: celery -A telegram_bot.celery.app beat --loglevel=info
     depends_on:
-      - telegram_bot
-      - rabbitmq
+      telegram_bot:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - mynetwork
     restart: always
