@@ -22,6 +22,8 @@ class AdminMenu(StatesGroup):
     initial = State()
     manage_events = State()
     enter_event_name = State()
+    enter_date_of_event = State()
+    upload_photo_of_event = State()
     delete_event = State()
     confirm_event_name = State()
 

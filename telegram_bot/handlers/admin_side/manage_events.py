@@ -49,13 +49,3 @@ async def delete_event(message: Message, state: FSMContext):
 async def back(message: Message, state: FSMContext):
     await main_bot_menu(message, state)
 
-
-@dp.message(AdminMenu.enter_event_name)
-async def enter_event_name(message: Message, state: FSMContext):
-    name_of_event = message.text
-    markup = create_keyboard_buttons('Да', 'Назад')
-    await message.answer(f'Вы хотите создать мероприятие «{name_of_event}». Продолжить?',
-                         reply_markup=markup)
-    await state.update_data(name=name_of_event)
-    await state.set_state(AdminMenu.confirm_event_name)
-
