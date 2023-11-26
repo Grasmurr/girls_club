@@ -12,6 +12,7 @@ app.conf.beat_schedule = {
         'task': 'telegram_bot.tasks.send_mailing_signal',
         'schedule': crontab(minute='*'),
     },
+
 }
 app.autodiscover_tasks()
 # crontab(hour='10', minute='0')
