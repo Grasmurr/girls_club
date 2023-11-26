@@ -9,9 +9,10 @@ from telegram_bot import tasks
 app.conf.timezone = 'UTC'
 app.conf.beat_schedule = {
     'send-daily-message-every-morning': {
-        'task': 'telegram_bot.tasks.run_daily_mailing_sync',
+        'task': 'telegram_bot.tasks.send_mailing_signal',
         'schedule': crontab(minute='*'),
     },
+
 }
 app.autodiscover_tasks()
 # crontab(hour='10', minute='0')
