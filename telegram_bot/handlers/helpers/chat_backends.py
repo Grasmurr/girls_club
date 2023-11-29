@@ -1,6 +1,5 @@
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
-from telegram_bot.repository import api_methods
 
 import datetime
 

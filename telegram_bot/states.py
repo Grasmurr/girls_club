@@ -26,6 +26,13 @@ class AdminMenu(StatesGroup):
     upload_photo_of_event = State()
     delete_event = State()
     confirm_event_name = State()
+    confirm_event_banner = State()
+    enter_description_of_event = State()
+    confirm_description_of_event = State()
+    enter_new_girl_price = State()
+    enter_old_girl_price = State()
+    confirm_prices = State()
+    upload_ticket_photo = State()
 
     manage_mailing = State()
     handle_mailing = State()
