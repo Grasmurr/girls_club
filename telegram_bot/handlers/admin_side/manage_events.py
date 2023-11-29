@@ -33,9 +33,16 @@ async def manage_events(message: Message, state: FSMContext):
 
 @dp.message(AdminMenu.manage_events, F.text == 'Создать мероприятие')
 async def create_new_event(message: Message, state: FSMContext):
+    markup = create_keyboard_buttons('Назад')
     await message.answer(text='Введите название мероприятия',
-                         reply_markup=ReplyKeyboardRemove())
+                         reply_markup=markup)
+
     await state.set_state(AdminMenu.enter_event_name)
+
+
+@dp.message(AdminMenu.enter_event_name, F.text == 'Назад')
+async def back_form_create_new_event(message: Message, state: FSMContext):
+    await manage_events (message, state)
 
 
 @dp.message(AdminMenu.manage_events, F.text == 'Удалить мероприятие')

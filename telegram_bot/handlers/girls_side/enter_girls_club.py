@@ -145,6 +145,7 @@ async def handle_admin_decision(call: CallbackQuery, state: FSMContext):
         markup = create_keyboard_buttons('Зарегистрироваться')
         await state.set_state(Initial.initial)
         await bot.send_message(chat_id=ans[7:],
-                               text=f'Добро пожаловать в телеграм бот женского клуба! Для регистрации скорее'
+                               text=f'Добро пожаловать в телеграм бот женского клуба! '
+                                    f'Для регистрации скорее'
                                     f'нажимай кнопку "Зарегистрироваться"',
                                reply_markup=markup)
