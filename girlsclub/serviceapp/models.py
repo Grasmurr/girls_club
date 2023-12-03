@@ -24,3 +24,9 @@ class Newsletter(models.Model):
     number = models.IntegerField(null=True)
     photo_id = models.TextField()
     text = models.TextField()
+
+
+class UnregisteredGirl(models.Model):
+    telegram_id = models.BigIntegerField(null=True)
+    is_registered = models.BooleanField(default=False)
+

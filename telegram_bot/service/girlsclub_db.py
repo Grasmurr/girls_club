@@ -111,3 +111,17 @@ async def delete_newsletter(number):
 
 async def get_newsletter(number):
     return await get_from_api(f'newsletter/get/{number}/')
+
+
+async def create_unregistered_girl(telegram_id):
+    data = {k: v for k, v in locals().items() if v is not None}
+    return await send_to_api('member_girl/create/', data)
+
+
+async def get_unregistered_girl(telegram_id):
+    return await get_from_api(f'unregistered_girl/get/{telegram_id}/')
+
+
+async def update_unregistered_girl(telegram_id):
+    data = {f'new_{k}': v for k, v in locals().items() if v is not None and k != 'unique_id'}
+    return await send_to_api(f'unregistered_girl/update/{telegram_id}/', data)

@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from .models import Event, MemberGirl, Newsletter
+from .models import Event, MemberGirl, Newsletter, UnregisteredGirl
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.forms.models import model_to_dict
@@ -82,7 +82,7 @@ def get_member_girl(request, telegram_id):
         member_girl = MemberGirl.objects.get(telegram_id=telegram_id)
         return JsonResponse(model_to_dict(member_girl))
     except MemberGirl.DoesNotExist:
-        return JsonResponse({'error': 'MemberGirl not found'}, status=404)\
+        return JsonResponse({'error': 'MemberGirl not found'}, status=404)
 
 
 @csrf_exempt
@@ -123,3 +123,35 @@ def get_newsletter(request, number):
         return JsonResponse(model_to_dict(newsletter))
     except Newsletter.DoesNotExist:
         return JsonResponse({'error': 'Newsletter not found'}, status=404)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def create_unregistered_girl(request):
+    data = json.loads(request.body)
+    member_girl = UnregisteredGirl.objects.create(**data)
+    return JsonResponse({'unique_id': member_girl.telegram_id})
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def update_unregistered_girl(request, telegram_id):
+    data = json.loads(request.body)
+    try:
+        member_girl = UnregisteredGirl.objects.get(telegram_id=telegram_id)
+        for field, value in data.items():
+            setattr(member_girl, field, value) if value is not None else None
+        member_girl.save()
+        return JsonResponse({"status": "updated"})
+    except UnregisteredGirl.DoesNotExist:
+        return JsonResponse({"error": "UnregisteredGirl not found"}, status=404)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_unregistered_girl(request, telegram_id):
+    try:
+        member_girl = UnregisteredGirl.objects.get(telegram_id=telegram_id)
+        return JsonResponse(model_to_dict(member_girl))
+    except UnregisteredGirl.DoesNotExist:
+        return JsonResponse({'error': 'MemberGirl not found'}, status=404)

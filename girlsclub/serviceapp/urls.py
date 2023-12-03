@@ -16,4 +16,8 @@ urlpatterns = [
     path('newsletter/create_or_update/<int:number>/', views.create_or_update_newsletter),
     path('newsletter/delete/<int:number>/', views.delete_newsletter),
     path('newsletter/get/<int:number>/', views.get_newsletter),
+
+    path('unregistedgirl/create/int:telegram_id/', views.create_unregistered_girl),
+    path('unregistedgirl/update/int:telegram_id/', views.update_unregistered_girl),
+    path('unregistedgirl/get/int:telegram_id/', views.get_unregistered_girl),
 ]
