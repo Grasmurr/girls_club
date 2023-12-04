@@ -8,7 +8,7 @@ class Event(models.Model):
     event_photo_id = models.CharField(max_length=100)
     ticket_photo_id = models.CharField(max_length=100)
     description = models.TextField()
-    event_date = models.DateField(null=True)
+    event_date = models.DateField(null=True, max_length=100)
 
 
 class MemberGirl(models.Model):
