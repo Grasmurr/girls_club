@@ -75,6 +75,10 @@ async def delete_event(name):
 async def get_event(name):
     return await get_from_api(f'event/get/{name}/')
 
+async def get_all_event():
+    return await get_from_api(f'event/get_all_event/')
+
+
 
 # Для модели MemberGirl
 async def create_member_girl(telegram_id, full_name, age, unique_id, discussion_topics, joining_purpose):

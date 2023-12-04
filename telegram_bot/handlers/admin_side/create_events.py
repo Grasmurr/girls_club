@@ -15,17 +15,31 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from aiogram import F
 from aiogram.enums.content_type import ContentType
 
-
 from telegram_bot.service import girlsclub_db
 from telegram_bot.states import Initial, AdminMenu
 from telegram_bot.handlers.main_menu import create_keyboard_buttons
 from telegram_bot.assets.configs import config
 from telegram_bot.handlers.admin_side.main_menu import main_bot_menu
-from telegram_bot.handlers.admin_side.manage_events import create_new_event
+from telegram_bot.handlers.admin_side.manage_events import manage_events
 from telegram_bot.handlers.helpers import chat_backends
 from telegram_bot.service.girlsclub_db import create_event
 
 import datetime
+
+
+
+
+@dp.message(AdminMenu.manage_events, F.text == 'Создать мероприятие')
+async def create_new_event(message: Message, state: FSMContext):
+    markup = create_keyboard_buttons('Назад')
+    await message.answer(text='Введите название мероприятия',
+                         reply_markup=markup)
+
+    await state.set_state(AdminMenu.enter_event_name)
+
+@dp.message(AdminMenu.enter_event_name, F.text == 'Назад')
+async def back_form_create_new_event(message: Message, state: FSMContext):
+    await manage_events (message, state)
 
 
 @dp.message(AdminMenu.enter_event_name)
@@ -59,14 +73,16 @@ async def create_event_date(message: Message, state: FSMContext):
         await message.answer(f'Дата мероприятия установлена на {event_date_str}\n\n'
                              f'Теперь пришлите, пожалуйста, баннер мероприятия')
         await state.set_state(AdminMenu.upload_photo_of_event)
+
     except ValueError:
+
         await message.answer('Пожалуйста, введите дату в формате YYYY-MM-DD. Например: 2023-10-29')
 
 
-@dp.message(AdminMenu.upload_photo_of_event, F.Photo)
+@dp.message(AdminMenu.upload_photo_of_event, F.photo)
 async def create_banner_of_event(message: Message, state: FSMContext):
-
     photo_id = message.photo[-1].file_id
+    print(photo_id)
     await state.update_data(mailing_type='Фото', photo_id=photo_id)
 
     buttons = chat_backends.create_keyboard_buttons('Подтвердить', 'Назад')
@@ -74,44 +90,50 @@ async def create_banner_of_event(message: Message, state: FSMContext):
     await message.answer_photo(photo=photo_id)
     await state.set_state(AdminMenu.confirm_event_banner)
 
-@dp.message(AdminMenu.upload_photo_of_event, F.Document)
+
+@dp.message(AdminMenu.upload_photo_of_event, F.document)
 async def wrong_banner_of_event(message: Message, state: FSMContext):
     await message.answer('Пожалуйста, отправьте фотографию быстрым способом, не файлом')
 
-@dp.message(AdminMenu.upload_photo_of_event)
+
+@dp.message(AdminMenu.upload_photo_of_event, F.text)
 async def text_instead_banner_of_event(message: Message, state: FSMContext):
     await message.answer('Кажется вы нажали не туда')
+
 
 @dp.message(AdminMenu.confirm_event_banner, F.text == 'Назад')
 async def back_from_banner_of_event(message: Message, state: FSMContext):
     await create_event_date(message, state)
 
+
 @dp.message(AdminMenu.confirm_event_banner, F.text == 'Подтвердить')
 async def enter_description_of_event(message: Message, state: FSMContext):
-
-    await message.answer ("Пожалуйста, пришлите описание мероприятия")
+    await message.answer("Пожалуйста, пришлите описание мероприятия", reply_markup=ReplyKeyboardRemove())
     await state.set_state(AdminMenu.enter_description_of_event)
+
 
 @dp.message(AdminMenu.enter_description_of_event)
 async def confirm_description_of_event(message: Message, state: FSMContext):
     description = message.text
     await state.update_data(description=description)
     markup = chat_backends.create_keyboard_buttons('Подтвердить', 'Назад')
-    await message.answer (f"Вы установили следующее описание для мероприятия: /n/n"
-                          f"{description}/n/n"
-                          f"Продолжить?", reply_markup=markup)
+    await message.answer(f"Вы установили следующее описание для мероприятия: \n\n"
+                         f"{description}\n\n"
+                         f"Продолжить?", reply_markup=markup)
     await state.set_state(AdminMenu.confirm_description_of_event)
+
 
 @dp.message(AdminMenu.confirm_description_of_event, F.text == 'Назад')
 async def back_from_confirm_description_of_event(message: Message, state: FSMContext):
     await enter_description_of_event(message, state)
 
-@dp.message(AdminMenu.confirm_event_banner, F.text == 'Подтвердить')
-async def enter_new_girl_price(message: Message, state: FSMContext):
 
-    await message.answer ("Введите цифрой стоимость билета для "
-                          "новых участников (без кода подруги)")
+@dp.message(AdminMenu.confirm_description_of_event, F.text == 'Подтвердить')
+async def enter_new_girl_price(message: Message, state: FSMContext):
+    await message.answer("Введите цифрой стоимость билета для "
+                         "новых участников (без кода подруги)")
     await state.set_state(AdminMenu.enter_new_girl_price)
+
 
 @dp.message(AdminMenu.enter_new_girl_price)
 async def enter_old_girl_price(message: Message, state: FSMContext):
@@ -121,6 +143,7 @@ async def enter_old_girl_price(message: Message, state: FSMContext):
                          "старых участников (со скидкой)")
     await state.set_state(AdminMenu.enter_old_girl_price)
 
+
 @dp.message(AdminMenu.enter_old_girl_price)
 async def enter_old_girl_price(message: Message, state: FSMContext):
     old_girl_price = int(message.text)
@@ -128,16 +151,16 @@ async def enter_old_girl_price(message: Message, state: FSMContext):
     data = await state.get_data()
     new_girl_price = data['new_girl_price']
     markup = chat_backends.create_keyboard_buttons('Продолжить', 'Ввести стоимость билетов заново')
-    await message.answer(f'Вы установили следующие стоимости билетов:/n/n'
-                         f'Для новых участниц: {new_girl_price}/n'
-                         f'Для старых участниц: {old_girl_price}/n/n'
+    await message.answer(f'Вы установили следующие стоимости билетов:\n\n'
+                         f'Для новых участниц: {new_girl_price}\n'
+                         f'Для старых участниц: {old_girl_price}\n\n'
                          f'Продолжить?', reply_markup=markup)
     await state.set_state(AdminMenu.confirm_prices)
 
 
 @dp.message(AdminMenu.confirm_prices, F.text == 'Продолжить')
 async def upload_ticket_photo(message: Message, state: FSMContext):
-    await message.answer('Пожалуйста пришлите макет билета (быстрым способом)')
+    await message.answer('Пожалуйста пришлите макет билета')
     await state.set_state(AdminMenu.upload_ticket_photo)
 
 
@@ -145,15 +168,16 @@ async def upload_ticket_photo(message: Message, state: FSMContext):
 async def rewrite_prices(message: Message, state: FSMContext):
     await enter_new_girl_price(message, state)
 
-@dp.message(AdminMenu.upload_ticket_photo, F.Photo)
-async def get_ticket_photo(message: Message, state: FSMContext):
 
+@dp.message(AdminMenu.upload_ticket_photo, F.photo)
+async def get_ticket_photo(message: Message, state: FSMContext):
     photo_id = message.photo[-1].file_id
     await state.update_data(mailing_type='Фото билета', ticket_photo_id=photo_id)
 
     await message.answer("Мероприятие зарегистрировано!")
 
     data = await state.get_data()
+    print (data['ticket_photo_id'], "АААААААААА")
     await create_event(
         name=data['name'],
         price_for_new=data['new_girl_price'],
@@ -165,4 +189,3 @@ async def get_ticket_photo(message: Message, state: FSMContext):
     )
 
     await main_bot_menu(message, state)
-

@@ -47,6 +47,16 @@ def get_event(request, name):
 
 
 @csrf_exempt
+@require_http_methods(["GET"])
+def get_all_event(request):
+    try:
+        event = Event.objects.all().values()
+        return JsonResponse({'data': list(event)}, safe=False)
+    except Event.DoesNotExist:
+        return JsonResponse({'error': 'Event not found'}, status=404)
+
+
+@csrf_exempt
 @require_http_methods(["POST"])
 def create_member_girl(request):
     data = json.loads(request.body)

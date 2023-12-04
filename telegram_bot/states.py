@@ -34,6 +34,15 @@ class AdminMenu(StatesGroup):
     confirm_prices = State()
     upload_ticket_photo = State()
 
+    choose_event_to_edit = State()
+    choose_parameter_to_edit = State()
+    edit_prices = State()
+    confirm_edited_prices = State()
+    edit_date = State()
+    edit_description = State()
+    edit_banner = State()
+    after_editing = State()
+
     manage_mailing = State()
     handle_mailing = State()
     delete_mailing = State()

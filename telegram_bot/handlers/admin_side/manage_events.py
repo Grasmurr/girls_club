@@ -24,32 +24,12 @@ from telegram_bot.handlers.admin_side.main_menu import main_bot_menu
 @dp.message(AdminMenu.initial, F.text == 'Управление мероприятиями')
 async def manage_events(message: Message, state: FSMContext):
     markup = create_keyboard_buttons('Создать мероприятие',
+                                     "Редактировать мероприятие",
                                      'Скрыть/показать мероприятие',
                                      'Назад')
     await state.set_state(AdminMenu.manage_events)
     await message.answer(text='Что вы хотите сделать?',
                          reply_markup=markup)
-
-
-@dp.message(AdminMenu.manage_events, F.text == 'Создать мероприятие')
-async def create_new_event(message: Message, state: FSMContext):
-    markup = create_keyboard_buttons('Назад')
-    await message.answer(text='Введите название мероприятия',
-                         reply_markup=markup)
-
-    await state.set_state(AdminMenu.enter_event_name)
-
-
-@dp.message(AdminMenu.enter_event_name, F.text == 'Назад')
-async def back_form_create_new_event(message: Message, state: FSMContext):
-    await manage_events (message, state)
-
-
-@dp.message(AdminMenu.manage_events, F.text == 'Удалить мероприятие')
-async def delete_event(message: Message, state: FSMContext):
-    await message.answer(text='Выберите мероприятие, которое вы хотите удалить:',
-                         reply_markup=ReplyKeyboardRemove())
-    await state.set_state(AdminMenu.delete_event)
 
 
 @dp.message(AdminMenu.manage_events, F.text == 'Назад')

@@ -6,6 +6,7 @@ urlpatterns = [
     path('event/update/<str:name>/', views.update_event),
     path('event/delete/<str:name>/', views.delete_event),
     path('event/get/<str:name>/', views.get_event),
+    path('event/get_all_event/', views.get_all_event),
 
     path('member_girl/create/', views.create_member_girl),
     path('member_girl/update/<int:telegram_id>/', views.update_member_girl),
