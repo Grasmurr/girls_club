@@ -28,10 +28,13 @@ def create_keyboard_buttons(*args):
     builder.adjust(2, 2)
     return builder.as_markup(resize_keyboard=True)
 
-
 async def personal_cabinet(message: Message, state: FSMContext):
     buttons = create_keyboard_buttons('Посмотреть мероприятия', 'Мой реферальный код')
     await message.answer(f"Добро пожаловать в личный кабинет, {message.from_user.full_name}! Что вы хотите сделать?",
                          reply_markup=buttons)
+
+
+
+
 
 

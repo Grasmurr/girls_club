@@ -134,10 +134,12 @@ async def handle_admin_decision(call: CallbackQuery, state: FSMContext):
         # TODO: Обсудить, как будут создаваться уникальные id
 
         await bot.send_message(chat_id=user_id, text='Админ подтвердил вашу заявку!')
-
+        markup = create_keyboard_buttons('Посмотреть мероприятия', 'Мой реферальный код')
         await bot.send_message(chat_id=user_id,
-                               text=f'Добро пожаловать в личный кабинет!')
-                               # reply_markup=markup)
+                               text=f'Добро пожаловать в личный кабинет!',
+                               reply_markup=markup)
+
+
     else:
         await bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id, text='Вы отказали в заявке представителю!')
