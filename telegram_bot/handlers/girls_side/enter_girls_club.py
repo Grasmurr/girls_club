@@ -14,7 +14,7 @@ from aiogram import F
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from telegram_bot.loader import dp, bot
-from telegram_bot.states import Survey, Initial
+from telegram_bot.states import Survey, Initial, PersonalCabinet
 from telegram_bot.handlers.main_menu import create_keyboard_buttons
 from telegram_bot.handlers.main_menu import main_bot_menu
 from telegram_bot.service import girlsclub_db
@@ -81,9 +81,18 @@ async def process_goal(message: Message, state: FSMContext):
 @dp.message(Survey.referral_code)
 async def process_referral_code(message: Message, state: FSMContext):
     if message.text != 'Пропустить':
-        '''Тут будет код для проверки на реферальный код'''
+        # TODO: '''Тут будет код для проверки на реферальный код'''
         await state.update_data(referral_code=message.text)
-        pass
+        old_or_new = "old"
+
+    else:
+        old_or_new = "new"
+
+    print ("ПЕЧАТАЮ  ", old_or_new)
+    await state.update_data(old_or_new=old_or_new)
+    data = await state.get_data()
+    print ("ПЕЧАТАЮ  ", data['old_or_new'])
+
 
     data = await state.get_data()
     await message.answer(f"Спасибо за заполнение анкеты! Вот ваши данные:\n\n"
@@ -100,7 +109,7 @@ async def process_referral_code(message: Message, state: FSMContext):
                                 f"\n\nИмя: {data['full_name']}\nВозраст: {data['age']}\n"
                                 f"Темы для обсуждения: {data['topics']}\nЦель кандидатки: {data['goal']}",
                            reply_markup=markup)
-    await state.clear()
+    # await state.clear()
 
 
 @dp.callback_query(lambda call: call.data.startswith('allow') or call.data.startswith('decline'))
@@ -125,19 +134,23 @@ async def handle_admin_decision(call: CallbackQuery, state: FSMContext):
         await bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
         await bot.send_message(chat_id=call.message.chat.id, text=f'Вы подтвердили заявку участницы '
                                                                   f'{data["full_name"]}!')
+        data = await state.get_data()
         await girlsclub_db.create_member_girl(telegram_id=user_id,
                                               full_name=data['full_name'],
                                               age=data['age'],
                                               unique_id='BOL123',
                                               discussion_topics=data['topics'],
-                                              joining_purpose=data['goal'])
+                                              joining_purpose=data['goal'],
+                                              old_or_new=data["old_or_new"])
         # TODO: Обсудить, как будут создаваться уникальные id
 
         await bot.send_message(chat_id=user_id, text='Админ подтвердил вашу заявку!')
-        markup = create_keyboard_buttons('Посмотреть мероприятия', 'Мой реферальный код')
+        await state.set_state(PersonalCabinet.girls_menu)
+        markup = create_keyboard_buttons('Афиша мероприятий', 'Мой реферальный код')
         await bot.send_message(chat_id=user_id,
-                               text=f'Добро пожаловать в личный кабинет!',
+                               text=f'Добро пожаловать в личный кабинет! Что вы хотите посмотреть?',
                                reply_markup=markup)
+
 
 
     else:

@@ -81,7 +81,7 @@ async def get_all_event():
 
 
 # Для модели MemberGirl
-async def create_member_girl(telegram_id, full_name, age, unique_id, discussion_topics, joining_purpose):
+async def create_member_girl(telegram_id, full_name, age, unique_id, discussion_topics, joining_purpose, old_or_new):
     data = {k: v for k, v in locals().items() if v is not None}
     return await send_to_api('member_girl/create/', data)
 

@@ -25,6 +25,13 @@ def create_keyboard_buttons(*args):
     return builder.as_markup(resize_keyboard=True)
 
 
+async def personal_cabinet(message: Message, state: FSMContext):
+    await state.set_state(PersonalCabinet.girls_menu)
+    buttons = create_keyboard_buttons('Афиша мероприятий', 'Мой реферальный код')
+    await message.answer(f"Добро пожаловать в личный кабинет! Что вы хотите посмотреть?",
+                         reply_markup=buttons)
+
+
 @dp.message(CommandStart())
 async def main_bot_menu(message: Message, state: FSMContext):
     await state.set_state(Initial.initial)
@@ -37,10 +44,3 @@ async def main_bot_menu(message: Message, state: FSMContext):
                              reply_markup=markup)
     else:
         await personal_cabinet(message, state)
-
-
-async def personal_cabinet(message: Message, state: FSMContext):
-    await state.set_state(PersonalCabinet.initial)
-    buttons = create_keyboard_buttons('Посмотреть мероприятия', 'Мой реферальный код')
-    await message.answer(f"Добро пожаловать в личный кабинет, {message.from_user.full_name}! Что вы хотите сделать?",
-                         reply_markup=buttons)

@@ -18,6 +18,7 @@ class MemberGirl(models.Model):
     unique_id = models.CharField(max_length=50)
     discussion_topics = models.TextField()
     joining_purpose = models.TextField()
+    old_or_new = models.TextField(null="new")
 
 
 class Newsletter(models.Model):

@@ -16,6 +16,9 @@ class Survey(StatesGroup):
 
 class PersonalCabinet(StatesGroup):
     initial = State()
+    girls_menu = State()
+    choose_event_to_show = State()
+    after_show_one_event = State()
 
 
 class AdminMenu(StatesGroup):

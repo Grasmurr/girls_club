@@ -29,6 +29,8 @@ import datetime
 
 
 
+
+
 @dp.message(AdminMenu.manage_events, F.text == 'Создать мероприятие')
 async def create_new_event(message: Message, state: FSMContext):
     markup = create_keyboard_buttons('Назад')
