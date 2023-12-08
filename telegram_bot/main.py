@@ -13,7 +13,6 @@ async def on_rabbitmq_message(message: aio_pika.IncomingMessage):
 
 
 async def rabbitmq_listener(loop):
-    # Подключение к RabbitMQ
     connection = await aio_pika.connect_robust(
         "amqp://guest:guest@rabbitmq/", loop=loop)
     channel = await connection.channel()

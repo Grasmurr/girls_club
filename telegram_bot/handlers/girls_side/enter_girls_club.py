@@ -18,8 +18,10 @@ from telegram_bot.states import Survey, Initial, PersonalCabinet
 from telegram_bot.handlers.main_menu import create_keyboard_buttons
 from telegram_bot.handlers.main_menu import main_bot_menu
 from telegram_bot.service import girlsclub_db
+from telegram_bot.handlers.helpers.referral_code import generate_unique_id
 
 from telegram_bot.assets.configs import config
+
 
 
 @dp.message(Initial.initial, F.text == 'Зарегистрироваться')
@@ -135,14 +137,15 @@ async def handle_admin_decision(call: CallbackQuery, state: FSMContext):
         await bot.send_message(chat_id=call.message.chat.id, text=f'Вы подтвердили заявку участницы '
                                                                   f'{data["full_name"]}!')
         data = await state.get_data()
+        unique_code = generate_unique_id()
+
         await girlsclub_db.create_member_girl(telegram_id=user_id,
                                               full_name=data['full_name'],
                                               age=data['age'],
-                                              unique_id='BOL123',
+                                              unique_id=unique_code,
                                               discussion_topics=data['topics'],
                                               joining_purpose=data['goal'],
                                               old_or_new=data["old_or_new"])
-        # TODO: Обсудить, как будут создаваться уникальные id
 
         await bot.send_message(chat_id=user_id, text='Админ подтвердил вашу заявку!')
         await state.set_state(PersonalCabinet.girls_menu)

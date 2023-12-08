@@ -179,7 +179,7 @@ async def get_ticket_photo(message: Message, state: FSMContext):
     await message.answer("Мероприятие зарегистрировано!")
 
     data = await state.get_data()
-    print (data['ticket_photo_id'], "АААААААААА")
+    print(data['ticket_photo_id'], "АААААААААА")
     await create_event(
         name=data['name'],
         price_for_new=data['new_girl_price'],
