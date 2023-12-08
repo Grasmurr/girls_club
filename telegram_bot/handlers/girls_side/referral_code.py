@@ -26,6 +26,7 @@ from telegram_bot.states import PersonalCabinet
 from telegram_bot.service.girlsclub_db import get_all_event, get_event, get_member_girl
 from telegram_bot.handlers.main_menu import create_keyboard_buttons
 
+
 @dp.message(PersonalCabinet.girls_menu, F.text == 'Мой реферальный код')
 async def send_referral_code(message: Message, state: FSMContext):
     await message.answer("Ваш реферальный код — GHF4839\n\n"
